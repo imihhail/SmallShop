@@ -9,6 +9,7 @@ function HomePage() {
   const [showWindow, setShowWindow] = useState(false);
   const [newProduct, setNewProduct] = useState({name: '', price: '', owner: 'No owner'});
   const [role, setRole] = useState('USER');
+  const [username, setUsername] = useState('');
 
 
   // TokenCheck
@@ -19,6 +20,7 @@ function HomePage() {
         if (response) {
           setProductsData(response.responseData.productsData || []);
           setRole(response.responseData.role)
+          setUsername(response.responseData.username)
         } else {
           navigate("/loginpage");
         }
@@ -41,18 +43,38 @@ function HomePage() {
   };
 
   // Update products
-  const newProductObj = () => {
-    InsertProduct(newProduct)
-    setProductsData((prev) => [...prev, newProduct])
-    setShowWindow(false)
+  const newProductObj = async() => {
+    const { responseData, error } = await InsertProduct(newProduct);
+
+    if (error) {
+      alert(error)
+      navigate("/loginpage")
+    } else {
+      setProductsData((prev) => [...prev, newProduct])
+      setShowWindow(false)
+    }
+  }
+    // if (!response.ok) {
+    //   const error = await response.json()
+    //   alert(error)
+    //   navigate("/loginpage")
+    // } else {
+    //    setProductsData((prev) => [...prev, newProduct])
+    //    setShowWindow(false)
+    // }
+  const deleteProduct = async(removedProduct) => {
+    const response = await DeleteProduct(removedProduct.id)
+    response && setProductsData(productsData.filter(product => product !== removedProduct))
   }
 
-  const deleteProduct = (id) => {
-    DeleteProduct(id)
-  }
-
-  const updateOwner = (id) =>{
-    UpdateOwner(id)
+  const updateOwner = async(newOwner) => {
+    const response = await UpdateOwner(newOwner.id)
+    if (response) {
+      setProductsData((prev) =>
+      prev.map((product) =>
+        product === newOwner ? { ...product, owner: username } : product
+      ))
+    }
   }
   
   const handleLogout = () => {
@@ -63,6 +85,8 @@ function HomePage() {
   return (
     <div className="homepage">
       <div className="content">
+
+        <p className="username">{username}</p>
         <button className="logout-button" onClick={handleLogout}>
           Logout
         </button>
@@ -84,9 +108,12 @@ function HomePage() {
                   <td>{product.name}</td>
                   <td>{product.owner}</td>
                   <td>{product.price}</td>
-                  <td onClick={() => updateOwner(product.id)} style={{ cursor: 'pointer' }}>
-                    <u><b>{role === "ADMIN" ? "DELETE" : "BUY"}</b></u>
-                  </td>
+                  {role == "ADMIN" ? <td onClick={() => deleteProduct(product)} style={{ cursor: 'pointer' }}>
+                    <u><b>DELETE</b></u>
+                  </td> : <td onClick={() => updateOwner(product)} style={{ cursor: 'pointer' }}>
+                    <u><b>BUY</b></u>
+                  </td>}
+
                 </tr>
               ))}
             </tbody>

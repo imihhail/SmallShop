@@ -22,13 +22,12 @@ import io.jsonwebtoken.security.Keys;
 public class JwtService {
 
     private static final String SECRET = "C79DD357C0FC53822BB123696439743D8A859F4A307A9B02A60A78CD841B6D350780649718E0561197AE668B7BB02E135E7F6A082981716EE1287BBC3B663992";
-    private static final long VALIDITY = TimeUnit.MINUTES.toMillis(60);
+    private static final long VALIDITY = TimeUnit.MINUTES.toMillis(1);
 
     public String generateToken(String username, String role) {
           Map<String, String> claims = new HashMap<>();
           claims.put("iss", "https://localhost:8080/home");
         return Jwts.builder()
-           // .claim("role", role)
             .claims(claims)
             .subject(username)
             .issuedAt(Date.from(Instant.now()))

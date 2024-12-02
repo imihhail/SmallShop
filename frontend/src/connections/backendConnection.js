@@ -61,12 +61,16 @@ export const TokenCheck = async () => {
           mode: "cors",
           credentials: "include",
       });
+      //console.log(response.text());
+      
 
       if (!response.ok) {
-        console.error(`HTTP error! status: ${response.status}`);
+        console.error(`HTTP error! Status: ${response.status}`);
         const error = await response.text(); 
-        return { error };
-    }
+        alert(error)
+        
+        return false 
+      }
       const responseData = await response.json(); 
       console.log("Token received: ", responseData);
       return { responseData }
@@ -118,16 +122,15 @@ export const InsertProduct = async (newProduct) => {
               "Content-Type": "application/json"
           },
           mode: "cors",
-          credentials: "include",
           body: JSON.stringify(newProduct),
-          credentials: "include",
+          credentials: "include"
       });
 
       if (!response.ok) {
         console.error(`HTTP error! status: ${response.status}`);
         const error = await response.text(); 
         return { error };
-    }
+      }
       const responseData = await response.json(); 
       console.log("Token received: ", responseData);
       return { responseData }
@@ -143,7 +146,7 @@ export const DeleteProduct = async (id) => {
   
   try {
       const response = await fetch("http://localhost:8080/deleteProduct", {
-          method: "POST",
+          method: "DELETE",
           headers: {
               "Authorization": `Bearer ${token}`,
               "Content-Type": "application/json"

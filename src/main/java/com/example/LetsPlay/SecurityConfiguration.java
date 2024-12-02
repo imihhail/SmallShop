@@ -37,7 +37,6 @@ public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws
         })
         .build();
 }
-
     
     @Bean
     public PasswordEncoder passwordEncoder() {

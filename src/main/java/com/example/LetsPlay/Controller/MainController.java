@@ -1,11 +1,12 @@
 package com.example.LetsPlay.Controller;
 
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
 import com.example.LetsPlay.Model.Products;
 import com.example.LetsPlay.Model.Users;
 import com.example.LetsPlay.Repository.UsersRepo;
@@ -34,37 +35,78 @@ public class MainController {
 
 @PostMapping("/registerUser")
 public ResponseEntity<?> registerUser(@RequestBody Users newUser) {
-    System.out.println("registered!");
-    System.out.println(newUser);
+    if (newUser.getUsername() == null || newUser.getUsername().isEmpty()) {
+        return ResponseEntity.status(400).body(Map.of(
+            "message", "Username cannot be empty"
+        ));
+    }
+
+    if (newUser.getUsername().length() > 20) {
+        return ResponseEntity.status(400).body(Map.of(
+            "message", "Username cannot exceed 20 characters"
+        ));
+    }
+
+    if (newUser.getPassword() == null || newUser.getPassword().isEmpty()) {
+        return ResponseEntity.status(400).body(Map.of(
+            "message", "Password cannot be empty"
+        ));
+    }
+
+    if (newUser.getPassword().length() > 20) {
+        return ResponseEntity.status(400).body(Map.of(
+            "message", "Password cannot exceed 20 characters"
+        ));
+    }
 
     if (newUser.getRole() != null) {
         return ResponseEntity.status(403).body(Map.of("message", "Role setting not allowed during registration"));
     }
 
-    newUser.setRole("USER");
-    newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
-    usersRepo.save(newUser);
+    try {
+        newUser.setRole("USER");
+        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        usersRepo.save(newUser);
 
-    return ResponseEntity.ok(Map.of(
-        "message", "Registration successful"
-    ));
+        return ResponseEntity.ok(Map.of(
+            "message", "Registration successful"
+        ));
+    } catch (DataIntegrityViolationException e) {
+        return ResponseEntity.status(409).body(Map.of(
+            "message", "Username is already registered"
+        ));
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(500).body(Map.of(
+            "message", "An unexpected error occurred. Please try again later."
+        ));
+    }
 }
+
 
 @PostMapping("/authenticate")
 public ResponseEntity<?> authenticate() {
     if (jwtCheck.authenticated) {
-        var allProducts = productsRepo.findByOwner("No owner");
-        return ResponseEntity.ok(Map.of(
-            "productsData", allProducts,
-            "role", jwtCheck.role));
+        if ("USER".equals(jwtCheck.role)) {
+            var filteredProducts = productsRepo.findByOwnerIn(List.of("No owner", jwtCheck.username));
+            return ResponseEntity.ok(Map.of(
+                "productsData", filteredProducts,
+                "role", jwtCheck.role,
+                "username", jwtCheck.username));
+        } else if ("ADMIN".equals(jwtCheck.role)) {
+            var foundProducts = productsRepo.findAll();
+            return ResponseEntity.ok(Map.of(
+                "productsData", foundProducts,
+                "role", jwtCheck.role,
+                "username", jwtCheck.username));
+        }
     }
-    
-    return ResponseEntity.status(403).body(Map.of("message", "UnAuthorized"));
+    return ResponseEntity.status(403).body(Map.of("message", "Unauthorized"));
 }
+
 
 @PostMapping("/insertProduct")
 public ResponseEntity<?> insertProduct(@RequestBody Products product) {
-    System.out.println("product inserted: " + product);
     if (jwtCheck.authenticated && "ADMIN".equals(jwtCheck.role)) {
         productsRepo.save(product);
         return ResponseEntity.ok(Map.of(
@@ -73,7 +115,7 @@ public ResponseEntity<?> insertProduct(@RequestBody Products product) {
     return ResponseEntity.status(403).body(Map.of("message", "UnAuthorized"));
 }
 
-@PostMapping("/deleteProduct")
+@DeleteMapping("/deleteProduct")
 public ResponseEntity<?> deleteProduct(@RequestBody Long productId) {
     if (jwtCheck.authenticated && "ADMIN".equals(jwtCheck.role)) {
         productsRepo.deleteById(productId);
