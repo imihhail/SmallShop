@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LoginUser, TokenCheck, SecurityCheck } from '../connections/backendConnection'
+import { LoginUser } from '../connections/backendConnection'
 import './registerPage.css';
-
 
 function LoginPage() {
   const [username, setUsername] = useState('');
@@ -25,28 +24,26 @@ function LoginPage() {
   const handleLogin = async () => {
     const response = await LoginUser(userData)
     if (response.token) {
-      console.log("Navigating home"); 
       navigate("/home")
     } else {
-      alert('Login failed')
+      alert(response)
     }
   }
 
-
   return (
     <div className="register-page">
-      
+
       <div className="form">
+
         <input type='text' id='username' placeholder='Username' onChange={validateUsername}></input>
         <input type='password' id='password' placeholder='Password' onChange={validatePassword}></input>
         <button onClick={handleLogin}>Login</button>
+
+        <p>Don't have an account? <a href="/registerpage">Register here</a></p>
+
       </div>
 
-      <button onClick={() => TokenCheck()} >TokenCheck</button>
-      <button onClick={() => SecurityCheck()} >SecurityCheck</button>
-      
     </div>
-
   )
 }
 

@@ -83,7 +83,6 @@ public ResponseEntity<?> registerUser(@RequestBody Users newUser) {
     }
 }
 
-
 @PostMapping("/authenticate")
 public ResponseEntity<?> authenticate() {
     if (jwtCheck.authenticated) {
@@ -103,7 +102,6 @@ public ResponseEntity<?> authenticate() {
     }
     return ResponseEntity.status(403).body(Map.of("message", "Unauthorized"));
 }
-
 
 @PostMapping("/insertProduct")
 public ResponseEntity<?> insertProduct(@RequestBody Products product) {
@@ -150,13 +148,6 @@ public ResponseEntity<?> updateProduct(@RequestBody Long productId) {
         if (requestedUsername.isPresent()) {
             if (passwordEncoder.matches(loginData.getPassword(), requestedUsername.get().getPassword())) {
                 String userRole = requestedUsername.get().getRole();
-                System.out.println(productsRepo.findAll());
-                // if (!"USER".equals(userRole)) { 
-                //     return ResponseEntity.status(403).body(Map.of(
-                //         "error", "NO ACCESS!"
-                //     ));
-                // }
-
                 String token = jwtService.generateToken(loginData.getUsername(), userRole);
                 return ResponseEntity.ok(Map.of(
                     "message", "Login successful",
@@ -170,11 +161,4 @@ public ResponseEntity<?> updateProduct(@RequestBody Long productId) {
         }
     }
 
-
-
-    @PostMapping("/security")
-    public void testSecurity() {       
-        System.out.println("Testing security..");
-        System.out.println(productsRepo.findAll());
-    }
 }

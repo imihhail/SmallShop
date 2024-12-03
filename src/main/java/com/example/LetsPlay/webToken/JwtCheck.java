@@ -27,6 +27,7 @@ public class JwtCheck extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
+        authenticated = false;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -39,15 +40,12 @@ public class JwtCheck extends OncePerRequestFilter {
             username = jwtService.extractUsername(jwt);
             
             if (username != null) {
-                System.out.println("username is not null: " + username);
                 Optional<Users> user = usersRepo.findByUsername(username);
     
                 if (user.isPresent() && jwtService.isTokenValid(jwt)) {
-                    System.out.println("token is valid");
                     role = user.get().getRole();
                     authenticated = true;
                 } else {
-                    System.out.println("Sending unauthorized msg...");
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.getWriter().write("Invalid token or user not found");
                     return;

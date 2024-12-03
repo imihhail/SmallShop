@@ -6,5 +6,6 @@ import com.example.LetsPlay.Model.Users;
 
 public interface UsersRepo extends JpaRepository<Users, Long> {
     Optional<Users> findByUsername(String username);
+    
 }
 

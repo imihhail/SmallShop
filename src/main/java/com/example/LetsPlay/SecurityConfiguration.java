@@ -32,7 +32,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws
         }))
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(registry -> {
-            registry.requestMatchers("/login", "/authenticate", "/registerUser", "/security", "/insertProduct", "/deleteProduct", "/updateOwner").permitAll();
+            registry.requestMatchers("/login", "/authenticate", "/registerUser", "/insertProduct", "/deleteProduct", "/updateOwner").permitAll();
             registry.anyRequest().authenticated();
         })
         .build();

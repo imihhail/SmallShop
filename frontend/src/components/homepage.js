@@ -25,7 +25,6 @@ function HomePage() {
           navigate("/loginpage");
         }
       } catch (error) {
-        console.error("Error checking token:", error);
         navigate("/loginpage");
       }
     };
@@ -33,7 +32,6 @@ function HomePage() {
     checkToken();
   }, [navigate]);
 
-  
   const openWindow = () => setShowWindow(true);
   const closeWindow = () => setShowWindow(false);
 
@@ -42,9 +40,8 @@ function HomePage() {
     setNewProduct((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Update products
   const newProductObj = async() => {
-    const { responseData, error } = await InsertProduct(newProduct);
+    const { error } = await InsertProduct(newProduct);
 
     if (error) {
       alert(error)
@@ -54,22 +51,25 @@ function HomePage() {
       setShowWindow(false)
     }
   }
-    // if (!response.ok) {
-    //   const error = await response.json()
-    //   alert(error)
-    //   navigate("/loginpage")
-    // } else {
-    //    setProductsData((prev) => [...prev, newProduct])
-    //    setShowWindow(false)
-    // }
+
   const deleteProduct = async(removedProduct) => {
-    const response = await DeleteProduct(removedProduct.id)
-    response && setProductsData(productsData.filter(product => product !== removedProduct))
+    const error = await DeleteProduct(removedProduct.id)
+
+    if (error) {
+      alert(error.error)
+      navigate("/loginpage")
+    } else {
+      setProductsData(productsData.filter(product => product !== removedProduct))
+    }
   }
 
   const updateOwner = async(newOwner) => {
-    const response = await UpdateOwner(newOwner.id)
-    if (response) {
+    const error = await UpdateOwner(newOwner.id)
+
+    if (error) {
+      alert(error.error)
+      navigate("/loginpage")
+    } else {
       setProductsData((prev) =>
       prev.map((product) =>
         product === newOwner ? { ...product, owner: username } : product
@@ -78,18 +78,20 @@ function HomePage() {
   }
   
   const handleLogout = () => {
-    localStorage.removeItem('token'); 
-    navigate('/loginpage');
+    localStorage.removeItem('token')
+    navigate('/loginpage')
   };
 
   return (
     <div className="homepage">
       <div className="content">
-
-        <p className="username">{username}</p>
-        <button className="logout-button" onClick={handleLogout}>
-          Logout
-        </button>
+        
+        <div className="userbox">
+          <p className="username">{username}</p>
+          <button className="logout-button" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
 
         <h1>Products</h1>
         {productsData.length > 0 ? (
