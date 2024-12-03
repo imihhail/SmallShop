@@ -16,7 +16,7 @@ Project objective is to create spring boot user authentication and authorization
 
 4. Run npm start and go to localhost:3030
 
-5. Admin user is already registered:
+5. Admin user is already registered. 
     Username: Admin
     Password: 1234
 
