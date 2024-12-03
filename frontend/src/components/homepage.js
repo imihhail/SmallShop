@@ -7,9 +7,10 @@ function HomePage() {
   const navigate = useNavigate();
   const [productsData, setProductsData] = useState([]);
   const [showWindow, setShowWindow] = useState(false);
-  const [newProduct, setNewProduct] = useState({name: '', price: '', owner: 'No owner'});
+  const [newProduct, setNewProduct] = useState({id: '', name: '', price: '', owner: 'No owner'});
   const [role, setRole] = useState('USER');
   const [username, setUsername] = useState('');
+  const [id, setId] = useState('');
 
 
   // TokenCheck
@@ -21,6 +22,7 @@ function HomePage() {
           setProductsData(response.responseData.productsData || []);
           setRole(response.responseData.role)
           setUsername(response.responseData.username)
+          setId(response.responseData.productId)
         } else {
           navigate("/loginpage");
         }
@@ -41,12 +43,13 @@ function HomePage() {
   };
 
   const newProductObj = async() => {
-    const { error } = await InsertProduct(newProduct);
+    const { error, responseData } = await InsertProduct(newProduct);
 
     if (error) {
       alert(error)
       navigate("/loginpage")
     } else {
+      newProduct.id = responseData.productId
       setProductsData((prev) => [...prev, newProduct])
       setShowWindow(false)
     }

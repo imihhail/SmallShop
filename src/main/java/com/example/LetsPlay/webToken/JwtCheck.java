@@ -57,7 +57,7 @@ public class JwtCheck extends OncePerRequestFilter {
             return;
         } catch (io.jsonwebtoken.security.SignatureException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Authentication failed");
+            response.getWriter().write("Unauthorized");
             return;
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

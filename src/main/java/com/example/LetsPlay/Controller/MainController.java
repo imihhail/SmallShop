@@ -106,12 +106,14 @@ public ResponseEntity<?> authenticate() {
 @PostMapping("/insertProduct")
 public ResponseEntity<?> insertProduct(@RequestBody Products product) {
     if (jwtCheck.authenticated && "ADMIN".equals(jwtCheck.role)) {
-        productsRepo.save(product);
+        Products savedProduct = productsRepo.save(product);
         return ResponseEntity.ok(Map.of(
-            "productsResponse", "Product inserted"));
+            "productsResponse", "Product inserted",
+            "productId", savedProduct.getId()));
     }
-    return ResponseEntity.status(403).body(Map.of("message", "UnAuthorized"));
+    return ResponseEntity.status(403).body(Map.of("message", "Unauthorized"));
 }
+
 
 @DeleteMapping("/deleteProduct")
 public ResponseEntity<?> deleteProduct(@RequestBody Long productId) {
@@ -120,7 +122,7 @@ public ResponseEntity<?> deleteProduct(@RequestBody Long productId) {
         return ResponseEntity.ok(Map.of(
             "productsResponse", "Product deleteed"));
     }
-    return ResponseEntity.status(403).body(Map.of("message", "UnAuthorized"));
+    return ResponseEntity.status(403).body(Map.of("message", "Unauthorized"));
 }
 
 @PutMapping("/updateOwner")
@@ -138,7 +140,7 @@ public ResponseEntity<?> updateProduct(@RequestBody Long productId) {
         return ResponseEntity.ok(Map.of(
             "productsResponse", "Owner updated"));
     }
-    return ResponseEntity.status(403).body(Map.of("message", "UnAuthorized"));
+    return ResponseEntity.status(403).body(Map.of("message", "Unauthorized"));
 }
 
     @PostMapping("/login")

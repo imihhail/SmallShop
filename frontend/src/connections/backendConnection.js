@@ -94,7 +94,7 @@ export const InsertProduct = async (newProduct) => {
         return { error }
       }
       
-      const responseData = await response.json(); 
+      const responseData = await response.json();
       return { responseData }
 
   } catch (error) {
