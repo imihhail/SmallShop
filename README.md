@@ -22,5 +22,5 @@ Project objective is to create spring boot user authentication and authorization
 
 6. If you dont have postgresql installed, then you can also get database wtih Docker.
     Docker commands are:
-       - docker pull ivardr/postgres:latest
-       - docker run -d --name postgres -p 5432:5432 --env-file .env ivardr/postgres:latest
+    -  docker pull ivardr/postgres:latest
+    -  docker run -d --name postgres -p 5432:5432 --env-file .env ivardr/postgres:latest
